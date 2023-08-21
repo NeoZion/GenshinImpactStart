@@ -18,10 +18,10 @@
 #### 项目地址
 
 ```
-[https://github.com/ScriptKid-Beta/Unexpected_information](https://github.com/NeoZion/GenshinImpactStart.git)
+https://github.com/NeoZion/GenshinImpactStart.git
 
 // zip文件
-[https://github.com/ScriptKid-Beta/Unexpected_information/releases](https://github.com/NeoZion/GenshinImpactStart/releases/download/v1.0.0/Genshinimpactstart.zip)https://github.com/NeoZion/GenshinImpactStart/releases/download/v1.0.0/Genshinimpactstart.zip
+https://github.com/NeoZion/GenshinImpactStart/releases/download/v1.0.0/Genshinimpactstart.zip
 ```
 
 #### 最后
