@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <Windows.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <mmsystem.h>
@@ -27,41 +27,66 @@ unsigned long __stdcall video(void* lp)
 	{
 		if (!capture.read(frame))
 			break;
-		namedWindow("mainWin", WINDOW_NORMAL);
-		setWindowProperty("mainWin", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-		setWindowProperty("mainWin", WND_PROP_TOPMOST, 1);
-		HWND hwnd = FindWindow(0, L"mainWin");
+		namedWindow("原神", WINDOW_NORMAL);
+		setWindowProperty("原神", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+		setWindowProperty("原神", WND_PROP_TOPMOST, 1);
+		HWND hwnd = FindWindow(0, L"原神");
 		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(RGB(0, 0, 0)));
-		imshow("mainWin", frame);
+		imshow("原神", frame);
 		char c = waitKey(7);
 		if (c == 36)
 			break;
 	}
 	capture.release();
-	destroyWindow("mainWin");
+	destroyWindow("原神");
 	return 0;
 }
 
 bool DetectScreen()
 {
-	HDC hdc = GetDC(NULL);
-	auto counter = 0;
-	auto ScreenWidth  = GetDeviceCaps(hdc, HORZRES);
-	auto ScreenHeight = GetDeviceCaps(hdc, VERTRES);
-	for (int width = ScreenWidth / 3; width < 2*ScreenWidth /3; width = width + 100) {
-		for (int height = ScreenWidth / 3; height < 2*ScreenWidth/3; height = height + 100) {
-			auto rgb = GetPixel(hdc, width, height);
-			if (rgb != RGB(255, 255, 255)) {
-				counter += 1;
-				if (counter > 6) {
-					ReleaseDC(NULL, hdc);
-					return FALSE;
-				}
+	COLORREF rgbwhite = 0xFFFFFFFF;
+	double whitecount = 0.0;
+
+	double width = GetSystemMetrics(SM_CXSCREEN);
+	double height = GetSystemMetrics(SM_CYSCREEN);
+
+	HDC hScreenDC = GetDC(NULL); 
+	HDC hMemDC = CreateCompatibleDC(hScreenDC); 
+
+	BITMAPINFO bmi; 
+	ZeroMemory(&bmi, sizeof(BITMAPINFO)); 
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = width;
+	bmi.bmiHeader.biHeight = -height;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biBitCount = 32;
+	bmi.bmiHeader.biCompression = BI_RGB;
+
+	LPVOID pBits;
+	HBITMAP hDIB = CreateDIBSection(hMemDC, &bmi, DIB_RGB_COLORS, &pBits, NULL, 0);
+
+	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDIB);
+
+	BitBlt(hMemDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
+
+	COLORREF* pPixel = (COLORREF*)pBits;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			if (*pPixel++ == rgbwhite)
+			{
+				whitecount++;
 			}
+
 		}
 	}
-	ReleaseDC(NULL,hdc);
-	return TRUE;
+
+	ReleaseDC(NULL, hScreenDC);
+	DeleteDC(hMemDC);
+	DeleteObject(hDIB);
+
+	return (whitecount / (width * height)) > 0.9 ? TRUE : FALSE;
 }
 
 void hidewindow()
@@ -78,13 +103,19 @@ int main()
 	hidewindow();
 	while (true)
 	{
-		if (DetectScreen() == TRUE) {
+		if (DetectScreen()) 
+		{
 			const int EVENT_NUM = 2;
-			HANDLE hobject[EVENT_NUM] = { NULL,NULL };
 			auto t1 = CreateThread(NULL, 0, sound, NULL, 0, NULL);
 			auto t2 = CreateThread(NULL, 0, video, NULL, 0, NULL);
-			Sleep(25000);
-			exit(1);
+			HANDLE hobject[EVENT_NUM] = { t1,t2 };
+			
+			if (WaitForMultipleObjects(EVENT_NUM, hobject, FALSE, INFINITE))
+			{
+				CloseHandle(t1);
+				CloseHandle(t2);
+				exit(1);
+			}
 		}
 
 		Sleep(100);
