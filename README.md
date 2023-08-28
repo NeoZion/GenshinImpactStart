@@ -21,7 +21,7 @@
 https://github.com/NeoZion/GenshinImpactStart.git
 
 // zip文件
-https://github.com/NeoZion/GenshinImpactStart/releases/download/v1.0.0/Genshinimpactstart.zip
+https://github.com/NeoZion/GenshinImpactStart/releases/download/v1.0.1/Genshinimpactstart.zip
 ```
 
 #### 最后
