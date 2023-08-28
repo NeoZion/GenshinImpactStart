@@ -1,6 +1,6 @@
 # GenshinImpactStart
 
-最近写了一个GenshinImpactStart
+本项目检测白屏自动播放原神启动动画和音乐，播放完毕程序自动退出。
 
 #### 介绍
 
