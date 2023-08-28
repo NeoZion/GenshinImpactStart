@@ -8,13 +8,13 @@
 using namespace std; 
 using namespace cv;
 
-unsigned long __stdcall sound(void* lp) 
+unsigned long __stdcall Sound(void* lp) 
 {
 	PlaySound(TEXT("./genshin.wav"), NULL, SND_FILENAME);
 	return 0;
 }
 
-unsigned long __stdcall video(void* lp)
+unsigned long __stdcall Video(void* lp)
 {
 	VideoCapture capture("./genshin.mp4");
 	if (!capture.isOpened())
@@ -89,7 +89,7 @@ bool DetectScreen()
 	return (whitecount / (width * height)) > 0.9 ? TRUE : FALSE;
 }
 
-void hidewindow()
+void HideWindow()
 {
 	auto hwnd = GetForegroundWindow();
 	if (hwnd)
@@ -100,14 +100,14 @@ void hidewindow()
 
 int main()
 {
-	hidewindow();
+	HideWindow();
 	while (true)
 	{
 		if (DetectScreen()) 
 		{
 			const int EVENT_NUM = 2;
-			auto t1 = CreateThread(NULL, 0, sound, NULL, 0, NULL);
-			auto t2 = CreateThread(NULL, 0, video, NULL, 0, NULL);
+			auto t1 = CreateThread(NULL, 0, Sound, NULL, 0, NULL);
+			auto t2 = CreateThread(NULL, 0, Video, NULL, 0, NULL);
 			HANDLE hobject[EVENT_NUM] = { t1,t2 };
 			
 			if (WaitForMultipleObjects(EVENT_NUM, hobject, FALSE, INFINITE))
